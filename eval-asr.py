@@ -5,7 +5,7 @@ from whisper.utils import jiwer_wrap, file2list
 
 if __name__=='__main__':
 
-    parser = argparse.ArgumentParser(description='Script to evaluate ASR transcirptions.', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser = argparse.ArgumentParser(description='Script to evaluate ASR transcriptions.', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('--hyps', type=str, required=True, default='File with hypotheses.')
     parser.add_argument('--refs', type=str, required=True, default='File with references.')
     parser.add_argument('--measures', action='store_true', help='show measures')
