@@ -47,5 +47,4 @@ class infer():
     def add(self, line):
         if self.fdo is not None:
             self.fdo.write(line + '\n')
-        else:
-            self.out.append(line)
+        self.out.append(line)
