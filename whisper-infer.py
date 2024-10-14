@@ -2,7 +2,7 @@ import sys
 import json
 import logging
 import argparse
-from whisper.infer import infer
+from scripts.infer import infer
 
 if __name__ == '__main__':
 

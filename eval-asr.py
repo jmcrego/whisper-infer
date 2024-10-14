@@ -1,7 +1,7 @@
 import sys
 import os
 import argparse
-from whisper.utils import jiwer_wrap, file2list
+from scripts.utils import jiwer_wrap, file2list
 
 if __name__=='__main__':
 
