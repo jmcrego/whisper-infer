@@ -22,7 +22,8 @@ if __name__ == '__main__':
     fdo = sys.stdout if args.output is None else open(args.output, 'w')
 
     w = infer(args.model, load=load)
-    for l in w(args.audio, fdo=fdo, split_stereo=args.split_stereo, transcribe=transcribe):
+    w(args.audio, split_stereo=args.split_stereo, transcribe=transcribe)
+    for l in w:
         fdo.write(l + '\n')
 
     if args.output is not None:
