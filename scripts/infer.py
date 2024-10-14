@@ -19,7 +19,7 @@ class infer():
         tic = time.time()
         self.audio = decode_audio(audio, split_stereo=split_stereo)
         if not isinstance(self.audio, tuple):
-            audio = [self.audio]
+            self.audio = [self.audio]
 
     def __iter__(self):
         yield f"model={self.model_name}"
