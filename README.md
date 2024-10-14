@@ -1,5 +1,5 @@
 # whisper-infer
-Python wrapper for faster_whisper to run inference on Whiseper models.
+Python wrapper for faster_whisper to run inference on Whisper models.
 
 **whisper-infer** employs [faster_whisper](https://github.com/SYSTRAN/faster-whisper/) to run the inference of Whisper models.
 
