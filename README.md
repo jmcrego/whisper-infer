@@ -33,7 +33,7 @@ $> python ./whisper-infer.py medium example.wav \
    --load '{"device": "cuda", "compute_type": "int8"}' \
    --transcribe '{"beam_size": 5, "word_timestaps": false, "vad_filter": true}'
 ```
-`LOAD` is a dictionariy with key/values passed to faster_whisper [loading](https://github.com/SYSTRAN/faster-whisper/blob/d57c5b40b06e59ec44240d93485a95799548af50/faster_whisper/transcribe.py#L583) function.
+`LOAD` is a dictionariy with key/values passed to faster_whisper [initialization](https://github.com/SYSTRAN/faster-whisper/blob/d57c5b40b06e59ec44240d93485a95799548af50/faster_whisper/transcribe.py#L584) function.
 `TRANSCRIBE` is a dictionary with key/values passed faster_whisper [transcribe](https://github.com/SYSTRAN/faster-whisper/blob/d57c5b40b06e59ec44240d93485a95799548af50/faster_whisper/transcribe.py#L705) function.
 
 ### eval-asr.py
