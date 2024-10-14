@@ -27,7 +27,11 @@ with open(OUTPUT_FILE, 'w') as fdo:
 
 Or use:
 ```
-$> python ./whisper-infer.py medium example.wav --split_stereo --output example.trs --load '{"device": "cuda", "compute_type": "int8"}' --transcribe '{"beam_size": 5, "word_timesta^Cs": false, "vad_filter": true}'
+$> python ./whisper-infer.py medium example.wav \
+   --split_stereo \
+   --output example.trs \
+   --load '{"device": "cuda", "compute_type": "int8"}' \
+   --transcribe '{"beam_size": 5, "word_timesta^Cs": false, "vad_filter": true}'
 ```
 
 ### eval-asr.py
