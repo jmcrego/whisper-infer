@@ -1,3 +1,4 @@
+import os
 import sys
 import json
 import logging
@@ -13,9 +14,13 @@ if __name__ == '__main__':
     parser.add_argument('--split_stereo', action='store_true', help='Split channels of (stereo) audio files')
     parser.add_argument('--load', type=str, default=None, required=False, help="JSON dictionary to control model loading. (https://github.com/SYSTRAN/faster-whisper/blob/d57c5b40b06e59ec44240d93485a95799548af50/faster_whisper/transcribe.py#L583)")
     parser.add_argument('--transcribe', type=str, default=None, required=False, help="JSON dictionary to control transcription. (https://github.com/SYSTRAN/faster-whisper/blob/d57c5b40b06e59ec44240d93485a95799548af50/faster_whisper/transcribe.py#L705)")
+    parser.add_argument('--force', action='store_true', help='Rewrite output file if exists')
     parser.add_argument('--silent', action='store_true', help='Silent mode')
     args = parser.parse_args()
     logging.basicConfig(format='[%(asctime)s.%(msecs)03d] %(levelname)s %(message)s', datefmt='%Y-%m-%d_%H:%M:%S', level=getattr(logging, 'WARNING' if args.silent else 'INFO'), filename=None)
+
+    if args.output is not None and args.force==False and os.path.exists(args.output):
+        raise ValueError("Ouput file {args.output} already exists! use --force to overwrite."))
     
     load = json.loads(args.load) if args.load is not None else {}
     transcribe = json.loads(args.transcribe) if args.transcribe is not None else {}
