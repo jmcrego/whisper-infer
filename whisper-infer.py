@@ -20,7 +20,7 @@ if __name__ == '__main__':
     logging.basicConfig(format='[%(asctime)s.%(msecs)03d] %(levelname)s %(message)s', datefmt='%Y-%m-%d_%H:%M:%S', level=getattr(logging, 'WARNING' if args.silent else 'INFO'), filename=None)
 
     if args.output is not None and args.force==False and os.path.exists(args.output):
-        raise ValueError("Ouput file {args.output} already exists! use --force to overwrite.")
+        raise ValueError(f"Ouput file {args.output} already exists! use --force to overwrite.")
     
     load = json.loads(args.load) if args.load is not None else {}
     transcribe = json.loads(args.transcribe) if args.transcribe is not None else {}
