@@ -1,7 +1,46 @@
 import re
 import jiwer
 
-def file2list(file):
+#pattern_hyp = r'\[(\d+\.\d+) -> (\d+\.\d+)\] (.+)' #[2.400 -> 2.920] allô?
+pattern_ref = r'PKCTS\S* (\d+) PKCTS\S* (\d+\.\d+) (\d+\.\d+) \S+ (.+)' #PKCTS01_FRE_FR_00186_02 1 PKCTS01_FRE_FR_00186_02_spk1 2.325 3.075 <o,f0,male> allô David ? 
+pattern_hyp = r'ch=(\d) start=(\d+\.\d+) end=(\d+\.\d+) txt=(.+)'
+
+def ref2list(file, channel):
+    entries = []
+    with open(file, 'r') as fd:
+        for l in fd: 
+            l = l.strip()
+            match = re.match(pattern_ref, l)
+            if match:
+                ch = int(match.group(1))
+                if ch != channel:
+                    continue
+                beg = float(match.group(2))
+                end = float(match.group(3))
+                txt = match.group(4)
+                entries.append({'beg': beg, 'end': end, 'txt': txt})
+                print('REF',entries[-1])
+    print(f'found {len(entries)} entries in {file}')
+    return entries
+
+def hyp2list(file, channel):
+    entries = []
+    with open(file, 'r') as fd:
+        for l in fd:
+            match = re.match(pattern_hyp, l.strip())
+            if match:
+                ch = int(match.group(1))
+                if ch != channel:
+                    continue
+                beg = float(match.group(2))
+                end = float(match.group(3))
+                txt = match.group(4)
+                entries.append({'beg': beg, 'end': end, 'txt': txt})
+                print('HYP',entries[-1])
+    print(f'found {len(entries)} entries in {file}')
+    return entries
+
+def file2list(file, input_type='raw'):
     segments = []
     with open(file, 'r') as fd:
         for l in fd:
@@ -28,11 +67,8 @@ class jiwer_wrap():
         self.punct = r"([,.!?;:\)\(\]\[\{\}\*&-])"
         self.punct_del = r"([\)\(])"
         self.apost = r"(\w+)'(\w+)"
-        #self.chars = r"[\(\)\*&]"
-        #self.initp = r"^\s*[,.!?;:]\s+"
         self.spaces = r"\s\s+"
 
-        
     def preprocess(self, txt, isRef):
         if self.no_noise:
             txt = re.sub(self.noise, '', txt)
@@ -55,12 +91,16 @@ class jiwer_wrap():
             hyp = [hyp]
         if isinstance(ref, str):
             ref = [ref]
-        hyp = [self.preprocess(h, False) for h in hyp]
-        ref = [self.preprocess(r, True) for r in ref]
+
+        #hyp = [h['txt'] for h in hyp]
+        #ref = [r['txt'] for r in ref]
 
         if self.single_line:
-            hyp = [' '.join(hyp)]
+            hyp = [''.join(hyp)]
             ref = [' '.join(ref)]
+
+        hyp = [self.preprocess(h, False) for h in hyp]
+        ref = [self.preprocess(r, True) for r in ref]
             
         if self.show_alignments:
             res = jiwer.process_words(ref, hyp) if self.use_words else jiwer.process_characters(ref, hyp)
@@ -76,9 +116,7 @@ class jiwer_wrap():
 class align_hyp_to_ref:
 
     def __init__(self):
-        
-        self.pattern_hyp = r'\[(\d+\.\d+) -> (\d+\.\d+)\] (.+)' #[2.400 -> 2.920] allô?
-        self.pattern_ref = r'PKCTS\S* (\d+) PKCTS\S* (\d+\.\d+) (\d+\.\d+) \S+ (.+)' #PKCTS01_FRE_FR_00186_02 1 PKCTS01_FRE_FR_00186_02_spk1 2.325 3.075 <o,f0,male> allô David ? 
+        pass
 
     def align_hyp_up_to(self, end, verbose=False):
         txt = []
@@ -100,8 +138,8 @@ class align_hyp_to_ref:
         return ''.join(txt).strip()
     
     def __call__(self, fhyp, fref, channel, verbose=False):
-        self.ref = self.read_reference(fref, channel)
-        self.hyp = self.read_hypothesis(fhyp)
+        self.ref = ref2list(fref, channel)
+        self.hyp = hyp2list(fhyp, channel)
         REF = []
         HYP = []    
         hyp_line = []
@@ -120,32 +158,3 @@ class align_hyp_to_ref:
         assert len(HYP) == len(REF)
         return HYP, REF
         
-    def read_reference(self, file, channel):
-        entries = []
-        with open(file, 'r') as fd:
-            for l in fd: 
-                l = l.strip()
-                match = re.match(self.pattern_ref, l)
-                if match:
-                    ch = int(match.group(1))
-                    beg = float(match.group(2))
-                    end = float(match.group(3))
-                    txt = match.group(4)
-                    if ch == channel:
-                        entries.append({'beg': beg, 'end': end, 'txt': txt})
-        print(f'found {len(entries)} entries in {file}')
-        return entries
-
-    def read_hypothesis(self, file):
-        entries = []
-        with open(file, 'r') as fd:
-            for l in fd: 
-                match = re.match(self.pattern_hyp, l)
-                if match:
-                    beg = float(match.group(1))
-                    end = float(match.group(2))
-                    txt = match.group(3)
-                    entries.append({'beg': beg, 'end': end, 'txt': txt})
-        print(f'found {len(entries)} entries in {file}')
-        return entries
-
