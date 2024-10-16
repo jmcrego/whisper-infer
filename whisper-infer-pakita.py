@@ -4,7 +4,8 @@ import json
 import logging
 import argparse
 from scripts.infer import infer
-from scripts.utils import ref2list
+from scripts.utils import ref2list, jiwer_wrap
+from faster_whisper import WhisperModel, decode_audio
 
 if __name__ == '__main__':
 
@@ -14,27 +15,24 @@ if __name__ == '__main__':
     parser.add_argument('--reference', type=str, default=None, help='Reference transcription with segmentation timestamps.')    
     parser.add_argument('--load', type=str, default=None, required=False, help="JSON dictionary to control model loading. (https://github.com/SYSTRAN/faster-whisper/blob/d57c5b40b06e59ec44240d93485a95799548af50/faster_whisper/transcribe.py#L583)")
     parser.add_argument('--transcribe', type=str, default=None, required=False, help="JSON dictionary to control transcription. (https://github.com/SYSTRAN/faster-whisper/blob/d57c5b40b06e59ec44240d93485a95799548af50/faster_whisper/transcribe.py#L705)")
-    parser.add_argument('--force', action='store_true', help='Rewrite output file if exists')
-    parser.add_argument('--silent', action='store_true', help='Silent mode')
     args = parser.parse_args()
     logging.basicConfig(format='[%(asctime)s.%(msecs)03d] %(levelname)s %(message)s', datefmt='%Y-%m-%d_%H:%M:%S', level=getattr(logging, 'WARNING' if args.silent else 'INFO'), filename=None)
 
     load = json.loads(args.load) if args.load is not None else {}
     transcribe = json.loads(args.transcribe) if args.transcribe is not None else {}
 
-    #w = infer(args.model, load=load)
+    w = infer(args.model, load=load)
 
     refs = []
     hyps = []
-    audio = read_audio(args.audio)
+    audio = decode_audio(args.audio, split_stereo=True)
     for ch in range(1, 3):
         ref = ref2list(args.reference, channel=ch)
         for e in ref:
             print(f"{e['beg']}, {e['end']}, {e['txt']}")
-            beg = e['beg']
-            end = e['end']
-            w(audio[beg:end], split_stereo=args.split_stereo, transcribe=transcribe)
+            w(audio[e['beg']:e['end']], split_stereo=False, transcribe=transcribe)
             refs.append(e['txt'])
-            hyps.append(''.join([l for l in w])
+            hyps.append(''.join([l for l in w]))
                         
-    #eval
+    s = jiwer_wrap(uppercase=True, no_punct=True, no_hesit=False, no_noise=True, split_apos=True)
+    s(refs, hyps)

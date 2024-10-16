@@ -1,4 +1,5 @@
 import re
+import sys
 import jiwer
 
 #pattern_hyp = r'\[(\d+\.\d+) -> (\d+\.\d+)\] (.+)' #[2.400 -> 2.920] allô?
