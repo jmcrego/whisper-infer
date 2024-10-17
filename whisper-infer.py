@@ -10,7 +10,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Script to run inference on Whisper models. Ex: python whisper-infer.py small --audio example.wav --load '{\"device\": \"cuda\", \"compute_type\": \"int8\"}' --transcribe '{\"language\": \"en\", \"beam_size\": 5, \"word_timestamps\": true}'")
     parser.add_argument('model', type=str, help='Path or name of the Whisper model. (https://github.com/SYSTRAN/faster-whisper/blob/d57c5b40b06e59ec44240d93485a95799548af50/faster_whisper/utils.py#L12)')
     parser.add_argument('--audio', type=str, required=True, help='Audio file to transcribe.')    
-    parser.add_argument('--channel', type=int, default=None, help='Transcribe channel of the audio.')    
+    parser.add_argument('--channel', type=int, default=None, help='Transcribe channel of the audio (0 or 1).')    
     parser.add_argument('--start', type=float, default=None, help='Transcribe starting at this second.')    
     parser.add_argument('--end', type=float, default=None, help='Transcribe ending at this second.')    
     parser.add_argument('--output', type=str, default=None, required=False, help='File where to print transcriptions (or print on STDOUT).')

@@ -23,7 +23,7 @@ class infer():
         logging.info(f"start={start}")
         logging.info(f"end={end}")
         logging.info(f"transcribe={transcribe}")
-        channel = 0 if channel is None else channel-1
+        channel = 0 if channel is None else channel
         start = 0 if start is None else int(start*16000)
         end = len(self.audio[0]) if end is None else int(end*16000)
         res = []
@@ -40,6 +40,8 @@ class infer():
         if save is not None:
             print(f'save into {save}')
             wavfile.write(save, 16000, np.int16(self.audio[channel][start:end] * 32767))
+
+        logging.info(f"hyp={''.join([e['txt'] for e in res])}")
         return res
 
         

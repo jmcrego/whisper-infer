@@ -13,15 +13,13 @@ def ref2list(file, channel):
             l = l.strip()
             match = re.match(pattern_ref, l)
             if match:
-                ch = int(match.group(1))
+                ch = int(match.group(1))-1
                 if ch != channel:
                     continue
-                beg = float(match.group(2))
+                start = float(match.group(2))
                 end = float(match.group(3))
                 txt = match.group(4)
-                entries.append({'beg': beg, 'end': end, 'txt': txt})
-                #print('REF',entries[-1])
-    #print(f'found {len(entries)} entries in {file}')
+                entries.append({'start': start, 'end': end, 'txt': txt})
     return entries
 
 def hyp2list(file, channel):
@@ -33,12 +31,10 @@ def hyp2list(file, channel):
                 ch = int(match.group(1))
                 if ch != channel:
                     continue
-                beg = float(match.group(2))
+                start = float(match.group(2))
                 end = float(match.group(3))
                 txt = match.group(4)
-                entries.append({'beg': beg, 'end': end, 'txt': txt})
-                #print('HYP',entries[-1])
-    #print(f'found {len(entries)} entries in {file}')
+                entries.append({'start': start, 'end': end, 'txt': txt})
     return entries
 
 def file2list(file, input_type='raw'):
@@ -46,7 +42,6 @@ def file2list(file, input_type='raw'):
     with open(file, 'r') as fd:
         for l in fd:
             segments.append(l.strip())
-    #print(f'found {len(segments)} segments in {file})', file=sys.stderr)
     return segments
 
 
@@ -122,10 +117,10 @@ class align_hyp_to_ref:
     def align_hyp_up_to(self, end, verbose=False):
         txt = []
         while len(self.hyp):
-            b, e, t = self.hyp[0]['beg'], self.hyp[0]['end'], self.hyp[0]['txt']
+            s, e, t = self.hyp[0]['start'], self.hyp[0]['end'], self.hyp[0]['txt']
             if verbose:
-                print(f'\tword [{b}, {e}) {t}')
-            if len(self.ref)==0 or b < end:
+                print(f'\tword [{s}, {e}) {t}')
+            if len(self.ref)==0 or s < end:
                 txt.append(t)
                 self.hyp.pop(0)
                 if verbose:
@@ -146,10 +141,10 @@ class align_hyp_to_ref:
         hyp_line = []
         while len(self.ref):
             curr_ref = self.ref.pop(0)
-            beg, end, txt = curr_ref['beg'], curr_ref['end'], curr_ref['txt']
+            start, end, txt = curr_ref['start'], curr_ref['end'], curr_ref['txt']
             REF.append(txt)
             if verbose:
-                print(f'REF: [{beg}, {end}) {txt}')
+                print(f'REF: [{start}, {end}) {txt}')
             txt = self.align_hyp_up_to(end, verbose)
             HYP.append(txt)
             if verbose:
