@@ -20,8 +20,8 @@ def ref2list(file, channel):
                 end = float(match.group(3))
                 txt = match.group(4)
                 entries.append({'beg': beg, 'end': end, 'txt': txt})
-                print('REF',entries[-1])
-    print(f'found {len(entries)} entries in {file}')
+                #print('REF',entries[-1])
+    #print(f'found {len(entries)} entries in {file}')
     return entries
 
 def hyp2list(file, channel):
@@ -37,8 +37,8 @@ def hyp2list(file, channel):
                 end = float(match.group(3))
                 txt = match.group(4)
                 entries.append({'beg': beg, 'end': end, 'txt': txt})
-                print('HYP',entries[-1])
-    print(f'found {len(entries)} entries in {file}')
+                #print('HYP',entries[-1])
+    #print(f'found {len(entries)} entries in {file}')
     return entries
 
 def file2list(file, input_type='raw'):
@@ -46,13 +46,12 @@ def file2list(file, input_type='raw'):
     with open(file, 'r') as fd:
         for l in fd:
             segments.append(l.strip())
-    print(f'found {len(segments)} segments in {file})', file=sys.stderr)
+    #print(f'found {len(segments)} segments in {file})', file=sys.stderr)
     return segments
 
 
 class jiwer_wrap():
-    def __init__(self, show_measures=True, show_alignments=False, skip_correct=False, use_words=True, uppercase=False, no_punct=False, no_hesit=False, no_noise=False, split_apos=False, single_line=False):
-        self.show_measures=show_measures
+    def __init__(self, show_alignments=False, skip_correct=False, use_words=False, uppercase=False, no_punct=False, no_hesit=False, no_noise=False, split_apos=False, single_line=False):
         self.show_alignments=show_alignments
         self.skip_correct=skip_correct
         self.use_words = use_words
@@ -93,9 +92,6 @@ class jiwer_wrap():
         if isinstance(ref, str):
             ref = [ref]
 
-        #hyp = [h['txt'] for h in hyp]
-        #ref = [r['txt'] for r in ref]
-
         if self.single_line:
             hyp = [''.join(hyp)]
             ref = [' '.join(ref)]
@@ -107,12 +103,16 @@ class jiwer_wrap():
             res = jiwer.process_words(ref, hyp) if self.use_words else jiwer.process_characters(ref, hyp)
             print(jiwer.visualize_alignment(res, show_measures=False, skip_correct=self.skip_correct))
             
-        if self.show_measures:
-            wer = jiwer.wer(ref, hyp)
-            cer = jiwer.cer(ref, hyp)
-            print(f'wer={wer}')
-            print(f'cer={cer}')
-        
+        measures = jiwer.compute_measures(ref, hyp)
+        #print(measures.keys())
+        wer = 100*measures['wer']
+        D = measures['deletions']
+        S = measures['substitutions']
+        I = measures['insertions']
+        H = measures['hits']
+        N = sum([len(r) for r in measures['truth']])
+        return f"WER {wer:.2f} err {D+S+I} len {N} sub {S} del {D} ins {I} hit {H}"
+
 
 class align_hyp_to_ref:
 
