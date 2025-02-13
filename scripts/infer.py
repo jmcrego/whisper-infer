@@ -28,20 +28,28 @@ class infer():
         end = len(self.audio[0]) if end is None else int(end*16000)
         res = []
         for ch in range(len(self.audio)):
+            curr_res = []
             if channel != ch:
                 continue
+            tic = time.time()
+            nwords = 0
             segments, info = self.model.transcribe(self.audio[ch][start:end], **transcribe)
             for segment in segments:
                 if transcribe.get('word_timestamps') is True:
                     for word in segment.words:
-                        res.append({'ch': ch+1, 'start': word.start, 'end': word.end, 'txt': word.word})
+                        curr_res.append({'ch': ch+1, 'start': word.start, 'end': word.end, 'txt': word.word})
+                        nwords += 1
                 else:
-                    res.append({'ch': ch+1, 'start': segment.start, 'end': segment.end, 'txt': segment.text})
+                    curr_res.append({'ch': ch+1, 'start': segment.start, 'end': segment.end, 'txt': segment.text})
+                    nwords += len(segment.text.split(' '))
+            hyp=''.join([e['txt'] for e in curr_res])
+            logging.warning(f"segment audio={(end-start)/16000.0:.3f} sec, time={time.time()-tic:.3f} sec, hyp={hyp}")
+            res += curr_res
+
         if save is not None:
             print(f'save into {save}')
             wavfile.write(save, 16000, np.int16(self.audio[channel][start:end] * 32767))
 
-        logging.info(f"hyp={''.join([e['txt'] for e in res])}")
         return res
 
         

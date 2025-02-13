@@ -3,7 +3,7 @@ import sys
 import json
 import logging
 import argparse
-from scripts.infer import infer
+from infer import infer
 
 if __name__ == '__main__':
 
@@ -26,12 +26,15 @@ if __name__ == '__main__':
     if args.output is not None and args.force==False and os.path.exists(args.output):
         raise ValueError(f"Ouput file {args.output} already exists! use --force to overwrite.")
     
-    fdo = sys.stdout if args.output is None else open(args.output, 'w')
     load = json.loads(args.load) if args.load is not None else {}
     transcribe = json.loads(args.transcribe) if args.transcribe is not None else {}
     wi = infer(args.model, args.audio, split_stereo=args.split_stereo, load=load)
     res = wi(channel=args.channel, start=args.start, end=args.end, transcribe=transcribe, save=args.save)    
+
+    fdo = sys.stdout if args.output is None else open(args.output, 'w')
+
     for e in res:
         fdo.write(f"{e}\n")
+
     if args.output is not None:
         fdo.close()
