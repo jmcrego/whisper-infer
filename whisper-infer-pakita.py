@@ -5,8 +5,8 @@ from tqdm import tqdm
 from json import loads
 import logging
 import argparse
-from infer import infer
-from utils import ref2list, jiwer_wrap
+from scripts import infer
+from scripts import ref2list, jiwer_wrap
 #from faster_whisper import WhisperModel, decode_audio
 
 if __name__ == '__main__':
