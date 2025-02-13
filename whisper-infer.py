@@ -3,7 +3,7 @@ import sys
 import json
 import logging
 import argparse
-from infer import infer
+from scripts import infer
 
 if __name__ == '__main__':
 
