@@ -1,5 +1,5 @@
 import argparse
-from scripts.utils import jiwer_wrap, file2list
+from scripts import jiwer_wrap, file2list
 
 if __name__=='__main__':
 

@@ -1,5 +1,5 @@
 import argparse
-from scripts.utils import align_hyp_to_ref
+from scripts import align_hyp_to_ref
 
 if __name__=='__main__':
 
